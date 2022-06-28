@@ -1,6 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Cazar Patos SC</string>
-    <string name="initial_time">0s</string>
     <string name="counter_description">Counter Description</string>
     <string name="counter_default">0</string>
     <string name="user_textview_text">User</string>
