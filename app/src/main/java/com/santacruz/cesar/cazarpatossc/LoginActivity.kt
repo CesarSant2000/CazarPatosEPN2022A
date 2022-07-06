@@ -8,30 +8,30 @@ import android.widget.Button
 import android.widget.EditText
 
 class LoginActivity : AppCompatActivity() {
-    lateinit var editTextEmail:EditText
-    lateinit var editTextPassword: EditText
-    lateinit var buttonLogin: Button
-    lateinit var buttonNewUser:Button
-    lateinit var mediaPlayer:MediaPlayer
+    private lateinit var editTextEmail:EditText
+    private lateinit var editTextPassword: EditText
+    private lateinit var buttonLogin: Button
+    private lateinit var buttonNewUser:Button
+    private lateinit var mediaPlayer:MediaPlayer
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        //Inicialización de variables
+        //Variables initialization
         editTextEmail = findViewById(R.id.editTextEmail)
         editTextPassword = findViewById(R.id.editTextPassword)
         buttonLogin = findViewById(R.id.buttonLogin)
         buttonNewUser = findViewById(R.id.buttonNewUser)
-        //Eventos clic
+        //Click events
         buttonLogin.setOnClickListener {
             val email = editTextEmail.text.toString()
             val clave = editTextPassword.text.toString()
-            //Validaciones de datos requeridos y formatos
-            if(!validarDatosRequeridos())
+            //Required data and templates validations
+            if(!validateRequiredData())
                 return@setOnClickListener
-            //Si pasa validación de datos requeridos, ir a pantalla principal
-            val intencion = Intent(this, MainActivity::class.java)
-            intencion.putExtra(EXTRA_LOGIN, email)
-            startActivity(intencion)
+            //If pass validation of required data, go to main screen
+            val intention = Intent(this, MainActivity::class.java)
+            intention.putExtra(EXTRA_LOGIN, email)
+            startActivity(intention)
         }
         buttonNewUser.setOnClickListener{
 
@@ -40,21 +40,21 @@ class LoginActivity : AppCompatActivity() {
         mediaPlayer.start()
     }
 
-    private fun validarDatosRequeridos():Boolean{
+    private fun validateRequiredData():Boolean{
         val email = editTextEmail.text.toString()
         val clave = editTextPassword.text.toString()
         if (email.isEmpty()) {
-            editTextEmail.error = "El email es obligatorio"
+            editTextEmail.error = "The email is required"
             editTextEmail.requestFocus()
             return false
         }
         if (clave.isEmpty()) {
-            editTextPassword.error = "La clave es obligatoria"
+            editTextPassword.error = "The password is required"
             editTextPassword.requestFocus()
             return false
         }
         if (clave.length < 3) {
-            editTextPassword.error = "La clave debe tener al menos 3 caracteres"
+            editTextPassword.error = "The password must be at least 3 characters"
             editTextPassword.requestFocus()
             return false
         }
