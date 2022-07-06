@@ -5,33 +5,47 @@ import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
+import com.santacruz.cesar.cazarpatossc.storage.EncryptedSharedPreferencesManager
+import com.santacruz.cesar.cazarpatossc.storage.FileStorageManager
+import com.santacruz.cesar.cazarpatossc.storage.SharedPreferencesManager
 
 class LoginActivity : AppCompatActivity() {
-    lateinit var editTextEmail:EditText
-    lateinit var editTextPassword: EditText
-    lateinit var buttonLogin: Button
-    lateinit var buttonNewUser:Button
-    lateinit var mediaPlayer:MediaPlayer
+    private lateinit var fileHandler: FileHandler
+    private lateinit var editTextEmail:EditText
+    private lateinit var editTextPassword: EditText
+    private lateinit var buttonLogin: Button
+    private lateinit var buttonNewUser:Button
+    private lateinit var checkBoxRememberMe: CheckBox
+    private lateinit var mediaPlayer:MediaPlayer
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        //Inicialización de variables
+        //Variables initialization
+        //fileHandler = SharedPreferencesManager(this)
+        //fileHandler = EncryptedSharedPreferencesManager(this)
+        fileHandler = FileStorageManager(this)
         editTextEmail = findViewById(R.id.editTextEmail)
         editTextPassword = findViewById(R.id.editTextPassword)
         buttonLogin = findViewById(R.id.buttonLogin)
         buttonNewUser = findViewById(R.id.buttonNewUser)
-        //Eventos clic
+        checkBoxRememberMe = findViewById(R.id.checkBoxRecordarme)
+
+        readPreferencesData()
+        //Click events
         buttonLogin.setOnClickListener {
             val email = editTextEmail.text.toString()
             val clave = editTextPassword.text.toString()
-            //Validaciones de datos requeridos y formatos
-            if(!validarDatosRequeridos())
+            //Required data and templates validations
+            if(!validateRequiredData())
                 return@setOnClickListener
-            //Si pasa validación de datos requeridos, ir a pantalla principal
-            val intencion = Intent(this, MainActivity::class.java)
-            intencion.putExtra(EXTRA_LOGIN, email)
-            startActivity(intencion)
+            //Saves preferences data.
+            savePreferencesData()
+            //If pass validation of required data, go to main screen
+            val intention = Intent(this, MainActivity::class.java)
+            intention.putExtra(EXTRA_LOGIN, email)
+            startActivity(intention)
         }
         buttonNewUser.setOnClickListener{
 
@@ -40,21 +54,39 @@ class LoginActivity : AppCompatActivity() {
         mediaPlayer.start()
     }
 
-    private fun validarDatosRequeridos():Boolean{
+    private fun readPreferencesData(){
+        val readList = fileHandler.readInformation()
+        checkBoxRememberMe.isChecked = true
+        editTextEmail.setText ( readList.first )
+        editTextPassword.setText ( readList.second )
+    }
+
+    private fun savePreferencesData(){
+        val email = editTextEmail.text.toString()
+        val clave = editTextPassword.text.toString()
+        val toSaveList:Pair<String,String> = if(checkBoxRememberMe.isChecked){
+            email to clave
+        } else{
+            "" to ""
+        }
+        fileHandler.saveInformation(toSaveList)
+    }
+
+    private fun validateRequiredData():Boolean{
         val email = editTextEmail.text.toString()
         val clave = editTextPassword.text.toString()
         if (email.isEmpty()) {
-            editTextEmail.error = "El email es obligatorio"
+            editTextEmail.error = "The email is required"
             editTextEmail.requestFocus()
             return false
         }
         if (clave.isEmpty()) {
-            editTextPassword.error = "La clave es obligatoria"
+            editTextPassword.error = "The password is required"
             editTextPassword.requestFocus()
             return false
         }
         if (clave.length < 3) {
-            editTextPassword.error = "La clave debe tener al menos 3 caracteres"
+            editTextPassword.error = "The password must be at least 3 characters"
             editTextPassword.requestFocus()
             return false
         }
