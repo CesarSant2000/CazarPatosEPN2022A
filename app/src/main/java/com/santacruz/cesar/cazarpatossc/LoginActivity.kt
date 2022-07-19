@@ -19,6 +19,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var buttonNewUser:Button
     private lateinit var checkBoxRememberMe: CheckBox
     private lateinit var mediaPlayer:MediaPlayer
+    private val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -37,6 +38,18 @@ class LoginActivity : AppCompatActivity() {
         buttonLogin.setOnClickListener {
             val email = editTextEmail.text.toString()
             val clave = editTextPassword.text.toString()
+            //Check valid email
+            if(email.isEmpty() || !email.matches(emailPattern.toRegex())){
+                editTextEmail.error = getString(R.string.invalid_email_string)
+                editTextEmail.requestFocus()
+                return@setOnClickListener
+            }
+            //Check valid password
+            if(clave.isEmpty() || clave.length < 8){
+                editTextPassword.error = "Ingrese una contraseña valida"
+                editTextPassword.requestFocus()
+                return@setOnClickListener
+            }
             //Required data and templates validations
             if(!validateRequiredData())
                 return@setOnClickListener
