@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     var anchoPantalla = 0
     var alturaPantalla = 0
     var gameOver = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -32,8 +33,13 @@ class MainActivity : AppCompatActivity() {
 
         //Obtener el usuario de pantalla login
         val extras = intent.extras ?: return
-        val usuario = extras.getString(EXTRA_LOGIN) ?:"Unknown"
+        val usuario = (extras.getString(EXTRA_LOGIN)?.substringBefore("@")) ?:"Unknown"
         textViewUsuario.text = usuario
+
+        //Add ActionBar
+        val actionbar = supportActionBar
+        actionbar?.title = "Cazar Patos Con ActionBar"
+        actionbar?.setDisplayHomeAsUpEnabled(true)
 
         //Determina el ancho y largo de pantalla
         inicializarPantalla()
@@ -91,6 +97,7 @@ class MainActivity : AppCompatActivity() {
     private fun mostrarDialogoGameOver() {
         val builder = AlertDialog.Builder(this)
         builder
+            .setIcon(R.drawable.duck_hunt_logo)
             .setMessage("Felicidades!!\nHas conseguido cazar $contador patos")
             .setTitle("Fin del juego")
             .setPositiveButton("Reiniciar"
