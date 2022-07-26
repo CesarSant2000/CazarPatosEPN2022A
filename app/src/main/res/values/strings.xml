@@ -1,10 +1,22 @@
 <resources>
-    <string name="app_name">Cazar Patos SC</string>
+    <string name="app_name">Duck Hunter SC</string>
     <string name="initial_time">0s</string>
     <string name="counter_description">Counter Description</string>
     <string name="counter_default">0</string>
     <string name="user_textview_text">User</string>
     <string name="time_description">Time Description</string>
     <string name="textview_time_default">60s</string>
-    <string name="invalid_email_string">Ingrese un email valido</string>
+    <string name="hall_de_fame">FAME HALL</string>
+    <string name="duck_hunt_logo">Duck Hunt Logo</string>
+    <string name="position_label_string">POS.</string>
+    <string name="ducks_label_string">Ducks</string>
+    <string name="player_label_string">Player</string>
+    <string name="action_new_game">New Game</string>
+    <string name="action_online_game">Online Game</string>
+    <string name="action_exit">Exit</string>
+    <string name="invalid_email_string">Enter a valid email address</string>
+    <string name="password_error_string">Enter a valid password</string>
+    <string name="password_error_lenght_string">The password must be at least 3 characters</string>
+    <string name="password_requirement_string">The password is required</string>
+    <string name="email_requirement_string">The email is required</string>
 </resources>

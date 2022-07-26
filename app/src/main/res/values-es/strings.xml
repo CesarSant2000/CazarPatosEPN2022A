@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cazar Patos SC</string>
+    <string name="action_settings">Ajustes</string>
+    <string name="counter_description">Descipcion del Contador</string>
+    <string name="counter_default">0</string>
+    <string name="user_textview_text">Usuario</string>
+    <string name="time_description">Descripcion del Tiempo</string>
+    <string name="textview_time_default">60s</string>
+    <string name="hall_de_fame">HALL DE FAMA</string>
+    <string name="duck_hunt_logo">Logo de Duck Hunt</string>
+    <string name="position_label_string">POS.</string>
+    <string name="ducks_label_string">Patos</string>
+    <string name="player_label_string">Jugador</string>
+    <string name="action_new_game">Nuevo Juego</string>
+    <string name="action_online_game">Juego Online</string>
+    <string name="action_exit">Salir</string>
+    <string name="initial_time">0s</string>
+    <string name="invalid_email_string">Ingrese un email valido</string>
+    <string name="password_error_string">Enter a valid password</string>
+    <string name="password_error_lenght_string">The password must be at least 3 characters</string>
+    <string name="password_requirement_string">The password is required</string>
+    <string name="email_requirement_string">The email is required</string>
+</resources>

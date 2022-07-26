@@ -1,6 +1,8 @@
 package com.santacruz.cesar.cazarpatossc
 
+import android.content.Intent
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
@@ -10,113 +12,159 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import android.os.CountDownTimer
+import android.view.Menu
+import android.view.MenuItem
 import java.util.*
+import com.santacruz.cesar.cazarpatossc.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-    lateinit var textViewUsuario: TextView
-    lateinit var textViewContador: TextView
-    lateinit var textViewTiempo: TextView
-    lateinit var imageViewPato: ImageView
-    var contador = 0
-    var anchoPantalla = 0
-    var alturaPantalla = 0
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var textViewUser: TextView
+    private lateinit var textViewCounter: TextView
+    lateinit var textViewTime: TextView
+    private lateinit var imageViewDuck: ImageView
+    private var counter = 0
+    private var screenWidth = 0
+    private var screenHeight = 0
     var gameOver = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        //Inicialización de variables
-        textViewUsuario = findViewById(R.id.textViewUser)
-        textViewContador = findViewById(R.id.textViewCounter)
-        textViewTiempo = findViewById(R.id.textViewTime)
-        imageViewPato = findViewById(R.id.imageViewDuck)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        //Obtener el usuario de pantalla login
+        //Variables initializations
+        textViewUser = findViewById(R.id.textViewUser)
+        textViewCounter = findViewById(R.id.textViewCounter)
+        textViewTime = findViewById(R.id.textViewTime)
+        imageViewDuck = findViewById(R.id.imageViewDuck)
+
+        //Get user from login screen
         val extras = intent.extras ?: return
-        val usuario = (extras.getString(EXTRA_LOGIN)?.substringBefore("@")) ?:"Unknown"
-        textViewUsuario.text = usuario
+        val user = (extras.getString(EXTRA_LOGIN)?.substringBefore("@")) ?: "Unknown"
+        textViewUser.text = user
 
-        //Add ActionBar
-        val actionbar = supportActionBar
-        actionbar?.title = "Cazar Patos Con ActionBar"
-        actionbar?.setDisplayHomeAsUpEnabled(true)
+        // showing the back button in action bar
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        //Determina el ancho y largo de pantalla
-        inicializarPantalla()
-        //Cuenta regresiva del juego
-        inicializarCuentaRegresiva()
-        //Evento clic sobre la imagen del pato
-        imageViewPato.setOnClickListener {
+        //Gets the screen width and height
+        screenInitializer()
+
+        //Game countdown timer
+        countdownInitializer()
+
+        //Click event over the duck image
+        imageViewDuck.setOnClickListener {
             if (gameOver) return@setOnClickListener
-            contador++
+            counter++
             MediaPlayer.create(this, R.raw.gunshot).start()
-            textViewContador.text = contador.toString()
-            imageViewPato.setImageResource(R.drawable.duck_clicked)
-            //Evento que se ejecuta luego de 500 milisegundos
+            textViewCounter.text = counter.toString()
+            imageViewDuck.setImageResource(R.drawable.duck_clicked)
+
+            //Delay event that plays after 500 milliseconds
             lifecycleScope.launch {
                 delay(500)
-                imageViewPato.setImageResource(R.drawable.duck)
-                moverPato()
+                imageViewDuck.setImageResource(R.drawable.duck)
+                duckMoves()
             }
         }
     }
-    private fun inicializarPantalla() {
-        // 1. Obtenemos el tamaño de la pantalla del dispositivo
-        val display = this.resources.displayMetrics
-        anchoPantalla = display.widthPixels
-        alturaPantalla = display.heightPixels
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
     }
 
-    private fun moverPato() {
-        val min = imageViewPato.width /2
-        val maximoX = anchoPantalla - imageViewPato.width
-        val maximoY = alturaPantalla - imageViewPato.height
-        // Generamos 2 números aleatorios, para la coordenadas x , y
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        //exit game
+        if (item.itemId == R.id.action_exit) {
+            finish()
+        }
+        //reset game
+        if (item.itemId == R.id.action_new_game) {
+            restartGame()
+        }
+        //go to link
+        if (item.itemId == R.id.action_online_game) {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://duckhuntjs.com/"))
+            startActivity(intent)
+        }
+        return when (item.itemId) {
+            R.id.action_exit -> true
+            R.id.action_new_game -> true
+            R.id.action_online_game -> true
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onContextItemSelected(item)
+    }
+
+    private fun screenInitializer() {
+        // 1. Get phone screen size
+        val display = this.resources.displayMetrics
+        screenWidth = display.widthPixels
+        screenHeight = display.heightPixels
+    }
+
+    private fun duckMoves() {
+        val min = imageViewDuck.width /2
+        val maximoX = screenWidth - imageViewDuck.width
+        val maximoY = screenHeight - imageViewDuck.height
+        // We generate 2 random numbers, for x and y axis
         val randomX = Random().nextInt(maximoX - min ) + 1
         val randomY = Random().nextInt(maximoY - min ) + 1
 
-        // Utilizamos los números aleatorios para mover el pato a esa nueva posición
-        imageViewPato.x = randomX.toFloat()
-        imageViewPato.y = randomY.toFloat()
+        // We use the 2 random numbers to move the duck to a new position
+        imageViewDuck.x = randomX.toFloat()
+        imageViewDuck.y = randomY.toFloat()
     }
-    var contadorTiempo = object : CountDownTimer(10000, 1000) {
+    private var timeCounter = object : CountDownTimer(10000, 1000) {
         override fun onTick(millisUntilFinished: Long) {
-            val segundosRestantes = millisUntilFinished / 1000
-            val stringSegundosRestantes = "${segundosRestantes}s"
-            textViewTiempo.text = stringSegundosRestantes
+            val remainingSeconds = millisUntilFinished / 1000
+            val stringRemainingSeconds = "${remainingSeconds}s"
+            textViewTime.text = stringRemainingSeconds
         }
         override fun onFinish() {
-            textViewTiempo.text = getString(R.string.initial_time)
+            textViewTime.text = getString(R.string.initial_time)
             gameOver = true
-            mostrarDialogoGameOver()
+            showGameOverDialog()
         }
     }
-    private fun inicializarCuentaRegresiva() {
-        contadorTiempo.start()
+    private fun countdownInitializer() {
+        timeCounter.start()
     }
-    private fun mostrarDialogoGameOver() {
+    private fun showGameOverDialog() {
         val builder = AlertDialog.Builder(this)
         builder
             .setIcon(R.drawable.duck_hunt_logo)
-            .setMessage("Felicidades!!\nHas conseguido cazar $contador patos")
-            .setTitle("Fin del juego")
-            .setPositiveButton("Reiniciar"
+            .setMessage("Congratulations!!\nYou have hunt $counter ducks")
+            .setTitle("Game Over")
+            .setPositiveButton("Restart"
             ) { _, _ ->
-                reiniciarJuego()
+                restartGame()
             }
-            .setNegativeButton("Cerrar"
+            .setNegativeButton("Exit"
             ) { _, _ ->
                 //dialog.dismiss()
             }
         builder.create().show()
     }
-    fun reiniciarJuego(){
-        contador = 0
+    private fun restartGame(){
+        counter = 0
         gameOver = false
-        contadorTiempo.cancel()
-        textViewContador.text = contador.toString()
-        moverPato()
-        inicializarCuentaRegresiva()
+        timeCounter.cancel()
+        textViewCounter.text = counter.toString()
+        duckMoves()
+        countdownInitializer()
     }
 
 }

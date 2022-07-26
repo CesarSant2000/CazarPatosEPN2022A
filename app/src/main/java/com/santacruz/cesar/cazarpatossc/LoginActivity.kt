@@ -2,14 +2,12 @@ package com.santacruz.cesar.cazarpatossc
 
 import android.content.Intent
 import android.media.MediaPlayer
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
-import com.santacruz.cesar.cazarpatossc.storage.EncryptedSharedPreferencesManager
+import androidx.appcompat.app.AppCompatActivity
 import com.santacruz.cesar.cazarpatossc.storage.FileStorageManager
-import com.santacruz.cesar.cazarpatossc.storage.SharedPreferencesManager
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var fileHandler: FileHandler
@@ -44,14 +42,8 @@ class LoginActivity : AppCompatActivity() {
                 editTextEmail.requestFocus()
                 return@setOnClickListener
             }
-            //Check valid password
-            if(clave.isEmpty() || clave.length < 8){
-                editTextPassword.error = "Ingrese una contraseña valida"
-                editTextPassword.requestFocus()
-                return@setOnClickListener
-            }
             //Required data and templates validations
-            if(!validateRequiredData())
+            if(!validateRequiredData(email, clave))
                 return@setOnClickListener
             //Saves preferences data.
             savePreferencesData()
@@ -85,21 +77,20 @@ class LoginActivity : AppCompatActivity() {
         fileHandler.saveInformation(toSaveList)
     }
 
-    private fun validateRequiredData():Boolean{
-        val email = editTextEmail.text.toString()
-        val clave = editTextPassword.text.toString()
+    private fun validateRequiredData(email: String, clave: String):Boolean{
+        //get string from resources
         if (email.isEmpty()) {
-            editTextEmail.error = "The email is required"
+            editTextEmail.error = getString(R.string.email_requirement_string)
             editTextEmail.requestFocus()
             return false
         }
         if (clave.isEmpty()) {
-            editTextPassword.error = "The password is required"
+            editTextPassword.error = getString(R.string.password_requirement_string)
             editTextPassword.requestFocus()
             return false
         }
-        if (clave.length < 3) {
-            editTextPassword.error = "The password must be at least 3 characters"
+        if (clave.length < 8) {
+            editTextPassword.error = getString(R.string.password_error_lenght_string)
             editTextPassword.requestFocus()
             return false
         }
