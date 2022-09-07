@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.santacruz.cesar.cazarpatossc">
-
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="extra.android.permission.READ_EXTERNAL_STORAGE"/>
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,10 +14,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DuckHuntSC"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-8503081447051773~1747457983"/>
+        <activity
+            android:name=".SignUpActivity"
+            android:exported="true"
+            android:parentActivityName=".LoginActivity"/>
         <activity
             android:name=".RankingActivity"
             android:exported="true"
-            android:parentActivityName=".LoginActivity">
+            android:parentActivityName=".MainActivity">
+        </activity>
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,13 +36,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LoginActivity"
-            android:exported="true">
-        </activity>
-        <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:parentActivityName=".LoginActivity"/>
+            android:parentActivityName=".LoginActivity" />
     </application>
-
 </manifest>

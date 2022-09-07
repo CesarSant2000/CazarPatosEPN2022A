@@ -20,7 +20,7 @@
         android:contentDescription="@string/app_logo_for_marketing" />
 
     <EditText
-        android:id="@+id/editTextEmail"
+        android:id="@+id/editTextEmailSignUp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -37,7 +37,7 @@
         android:autofillHints="" />
 
     <EditText
-        android:id="@+id/editTextPassword"
+        android:id="@+id/editTextPasswordSignUp"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -48,48 +48,22 @@
         android:textColor="@android:color/white"
         android:textColorLink="@android:color/white"
         android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="@+id/editTextEmail"
-        app:layout_constraintStart_toStartOf="@+id/editTextEmail"
-        app:layout_constraintTop_toBottomOf="@+id/editTextEmail"
+        app:layout_constraintEnd_toEndOf="@+id/editTextEmailSignUp"
+        app:layout_constraintStart_toStartOf="@+id/editTextEmailSignUp"
+        app:layout_constraintTop_toBottomOf="@+id/editTextEmailSignUp"
         android:autofillHints="" />
 
-
-    <CheckBox
-        android:id="@+id/checkBoxRememberMe"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/pixel"
-        android:text="@string/remember_me_string"
-        android:textColor="@color/colorAccent"
-        app:layout_constraintEnd_toEndOf="@+id/editTextPassword"
-        app:layout_constraintStart_toStartOf="@+id/editTextPassword"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPassword" />
-
     <Button
-        android:id="@+id/buttonLogin"
+        android:id="@+id/buttonCreateNewUser"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:fontFamily="@font/pixel"
-        android:backgroundTint="@color/colorPrimaryDark"
-        android:text="@string/start_game_string"
-        android:textColor="@android:color/white"
-        app:layout_constraintEnd_toEndOf="@+id/checkBoxRememberMe"
-        app:layout_constraintStart_toStartOf="@+id/checkBoxRememberMe"
-        app:layout_constraintTop_toBottomOf="@+id/checkBoxRememberMe" />
-
-    <Button
-        android:id="@+id/buttonNewUser"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:fontFamily="@font/pixel"
         android:backgroundTint="@color/colorPrimaryLight"
-        android:text="@string/new_user_string"
+        android:fontFamily="@font/pixel"
+        android:text="@string/create_new_user_string"
         android:textColor="@android:color/white"
-        app:layout_constraintEnd_toEndOf="@+id/buttonLogin"
-        app:layout_constraintStart_toStartOf="@+id/buttonLogin"
-        app:layout_constraintTop_toBottomOf="@+id/buttonLogin" />
+        app:layout_constraintEnd_toEndOf="@+id/editTextPasswordSignUp"
+        app:layout_constraintStart_toStartOf="@+id/editTextPasswordSignUp"
+        app:layout_constraintTop_toBottomOf="@+id/editTextPasswordSignUp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

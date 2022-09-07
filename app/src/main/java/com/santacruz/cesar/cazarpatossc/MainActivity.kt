@@ -12,8 +12,17 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.util.*
 import com.santacruz.cesar.cazarpatossc.databinding.ActivityMainBinding
 
@@ -23,10 +32,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var textViewCounter: TextView
     lateinit var textViewTime: TextView
     private lateinit var imageViewDuck: ImageView
+    lateinit var user:String
+    private lateinit var database: DatabaseReference
     private var counter = 0
     private var screenWidth = 0
     private var screenHeight = 0
     var gameOver = false
+    private var mediaPlayer: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,10 +51,17 @@ class MainActivity : AppCompatActivity() {
         textViewCounter = findViewById(R.id.textViewCounter)
         textViewTime = findViewById(R.id.textViewTime)
         imageViewDuck = findViewById(R.id.imageViewDuck)
+        database = Firebase.database.reference
+        mediaPlayer = MediaPlayer.create(this, R.raw.gunshot)
+        MobileAds.initialize(this) {}
+
+        val mAdView = findViewById<AdView>(R.id.adView)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
 
         //Get user from login screen
         val extras = intent.extras ?: return
-        val user = (extras.getString(EXTRA_LOGIN)?.substringBefore("@")) ?: "Unknown"
+        user = (extras.getString(EXTRA_LOGIN)?.substringBefore("@")) ?: "Unknown"
         textViewUser.text = user
 
         // showing the back button in action bar
@@ -58,7 +77,9 @@ class MainActivity : AppCompatActivity() {
         imageViewDuck.setOnClickListener {
             if (gameOver) return@setOnClickListener
             counter++
-            MediaPlayer.create(this, R.raw.gunshot).start()
+            if (! mediaPlayer!!.isPlaying){
+                mediaPlayer?.start()
+            }
             textViewCounter.text = counter.toString()
             imageViewDuck.setImageResource(R.drawable.duck_clicked)
 
@@ -67,33 +88,40 @@ class MainActivity : AppCompatActivity() {
                 delay(500)
                 imageViewDuck.setImageResource(R.drawable.duck)
                 duckMoves()
+                mediaPlayer?.pause()
+                mediaPlayer?.seekTo(0)
             }
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
-        return true
+        return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        //exit game
-        if (item.itemId == R.id.action_exit) {
-            finish()
-        }
-        //reset game
-        if (item.itemId == R.id.action_new_game) {
-            restartGame()
-        }
-        //go to link
-        if (item.itemId == R.id.action_online_game) {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://duckhuntjs.com/"))
-            startActivity(intent)
-        }
         return when (item.itemId) {
-            R.id.action_exit -> true
-            R.id.action_new_game -> true
-            R.id.action_online_game -> true
+            //exit game
+            R.id.action_exit -> {
+                timeCounter.cancel()
+                finish()
+                true
+            }
+            //reset game
+            R.id.action_new_game -> {
+                restartGame()
+                true
+            }
+            //go to link
+            R.id.action_online_game -> {
+                onlineGame()
+                true
+            }
+            R.id.action_ranking -> {
+                val intent = Intent(this, RankingActivity::class.java)
+                startActivity(intent)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -101,6 +129,7 @@ class MainActivity : AppCompatActivity() {
     override fun onContextItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
+                timeCounter.cancel()
                 finish()
                 return true
             }
@@ -137,6 +166,10 @@ class MainActivity : AppCompatActivity() {
             textViewTime.text = getString(R.string.initial_time)
             gameOver = true
             showGameOverDialog()
+            val playerName = textViewUser.text.toString()
+            val huntedDucks = textViewCounter.text.toString()
+            processHuntedDucksScore(playerName, huntedDucks.toInt())
+            processHuntedDucksScoreRTDB(playerName, huntedDucks.toInt())
         }
     }
     private fun countdownInitializer() {
@@ -167,5 +200,85 @@ class MainActivity : AppCompatActivity() {
         countdownInitializer()
     }
 
+    private fun onlineGame() {
+        timeCounter.cancel()
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://duckhuntjs.com/"))
+        startActivity(intent)
+    }
+
+    fun processHuntedDucksScore(playerName:String, huntedDucks:Int){
+        val player = Player(playerName,huntedDucks)
+        //Try to get ranking specific id,
+        //if exists update otherwise create it.
+        val db = Firebase.firestore
+        db.collection("ranking")
+            .whereEqualTo("user", player.user)
+            .get()
+            .addOnSuccessListener { documents ->
+                if(documents!= null && documents.documents.isNotEmpty()
+                ){
+                    val idDocument = documents.documents[0].id
+                    updatePlayersScore(idDocument, player)
+                }
+                else{
+                    enterPlayersScore(player)
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w(EXTRA_LOGIN, "Error getting documents", exception)
+                Toast.makeText(this, "Error getting players data", Toast.LENGTH_LONG).show()
+            }
+    }
+
+    fun processHuntedDucksScoreRTDB(playerName: String, huntedDucks: Int){
+        val playerId = playerName.replace('.', '_')
+        val player = Player(playerName,huntedDucks)
+        database.child("ranking").child(playerId).setValue(player)
+    }
+
+    private fun enterPlayersScore(player:Player){
+        val db = Firebase.firestore
+        db.collection("ranking")
+            .add(player)
+            .addOnSuccessListener {
+                Toast.makeText(this,"User score enter successfully", Toast.LENGTH_LONG).show()
+            }
+            .addOnFailureListener { exception ->
+                Log.w(EXTRA_LOGIN, "Error adding document", exception)
+                Toast.makeText(this,"Error writing user score", Toast.LENGTH_LONG).show()
+            }
+    }
+    private fun updatePlayersScore(idDocument:String, player:Player){
+        val db = Firebase.firestore
+        db.collection("ranking")
+            .document(idDocument)
+            //.update(contactHashMap)
+            .set(player) //another way to update
+            .addOnSuccessListener {
+                Toast.makeText(this,"User score updated successfully", Toast.LENGTH_LONG).show()
+            }
+            .addOnFailureListener { exception ->
+                Log.w(EXTRA_LOGIN, "Error updating document", exception)
+                Toast.makeText(this,"Error updating score" , Toast.LENGTH_LONG).show()
+            }
+    }
+
+    override fun onStop() {
+        Log.w(EXTRA_LOGIN, "Play canceled")
+        timeCounter.cancel()
+        textViewTime.text = getString(R.string.initial_time)
+        gameOver = true
+        mediaPlayer?.stop()
+        super.onStop()
+    }
+    override fun onDestroy() {
+        mediaPlayer?.release()
+        super.onDestroy()
+    }
+
+    override fun onPause() {
+        timeCounter.cancel()
+        super.onPause()
+    }
 }
 

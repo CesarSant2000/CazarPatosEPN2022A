@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "719266235628",
+    "project_id": "proyectocazarpatos-6d576",
+    "storage_bucket": "proyectocazarpatos-6d576.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719266235628:android:d0102873a260d559d711c9",
+        "android_client_info": {
+          "package_name": "com.santacruz.cesar.cazarpatossc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "719266235628-r0lc54d0jcpq5vjrugtjan8a515iq19i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBc_qxLQJPM4m06kyNQFdGv3aibItemGls"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "719266235628-r0lc54d0jcpq5vjrugtjan8a515iq19i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

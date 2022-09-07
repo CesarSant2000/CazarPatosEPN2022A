@@ -2,7 +2,7 @@ package com.santacruz.cesar.cazarpatossc.storage
 
 import android.app.Activity
 import android.os.Environment
-import com.santacruz.cesar.cazarpatossc.FileHandler
+import com.santacruz.cesar.cazarpatossc.interfaces.FileHandler
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -11,7 +11,7 @@ class FileStorageManager (private val activity: Activity): FileHandler {
     private fun isExternalStorageWritable(): Boolean {
         return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
     }
-    override fun saveInformation(dataToStore:Pair<String,String>){
+    override fun saveInformation(toSaveList:Pair<String,String>){
         if (isExternalStorageWritable()) {
             FileOutputStream(
                 File(
@@ -19,9 +19,9 @@ class FileStorageManager (private val activity: Activity): FileHandler {
                     "myLoginInformation.dat"
                 )
             ).bufferedWriter().use { outputStream ->
-                outputStream.write(dataToStore.first)
+                outputStream.write(toSaveList.first)
                 outputStream.write(System.lineSeparator())
-                outputStream.write(dataToStore.second)
+                outputStream.write(toSaveList.second)
             }
         }
     }
